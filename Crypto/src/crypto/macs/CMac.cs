@@ -3,6 +3,7 @@ using System;
 using Org.BouncyCastle.Crypto.Modes;
 using Org.BouncyCastle.Crypto.Paddings;
 using Org.BouncyCastle.Crypto.Parameters;
+using Org.BouncyCastle.Utilities.Encoders;
 
 namespace Org.BouncyCastle.Crypto.Macs
 {
@@ -72,16 +73,19 @@ namespace Org.BouncyCastle.Crypto.Macs
             IBlockCipher	cipher,
             int				macSizeInBits)
         {
+            Console.WriteLine("MAC size must be multiple of 8 bits");
+            //Console.WriteLine("Checking: MAC size must be multiple of 8 bits");
             if ((macSizeInBits % 8) != 0)
                 throw new ArgumentException("MAC size must be multiple of 8");
-
+            Console.WriteLine("MAC size must be less or equal to 8 * the cipher block size");
             if (macSizeInBits > (cipher.GetBlockSize() * 8))
             {
                 throw new ArgumentException(
                     "MAC size must be less or equal to "
                         + (cipher.GetBlockSize() * 8));
             }
-
+            Console.WriteLine("Block size must be either 64 or 128 bits");
+            //Console.WriteLine("Checking: Block size must be either 64 or 128 bit");
             if (cipher.GetBlockSize() != 8 && cipher.GetBlockSize() != 16)
             {
                 throw new ArgumentException(
@@ -142,8 +146,13 @@ namespace Org.BouncyCastle.Crypto.Macs
                 //initializes the L, Lu, Lu2 numbers
                 L = new byte[ZEROES.Length];
                 cipher.ProcessBlock(ZEROES, 0, L, 0);
+                Console.WriteLine("Generating Sub-Keys");
                 Lu = DoubleLu(L);
                 Lu2 = DoubleLu(Lu);
+
+                Console.WriteLine("Key: K1: " + Hex.ToHexString(Lu));
+                Console.WriteLine("Key: K2: " + Hex.ToHexString(Lu2));
+
             }
             else if (parameters != null)
             {
