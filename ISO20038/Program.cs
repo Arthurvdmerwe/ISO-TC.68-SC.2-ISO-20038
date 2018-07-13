@@ -6,6 +6,7 @@ using Org.BouncyCastle.Utilities;
 using Org.BouncyCastle.Utilities.Encoders;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -19,6 +20,10 @@ namespace ConsoleApp1
     class Program
     
     {
+
+
+        private static byte[] input_selfbytes = new byte[] { 0x6b, 0xc1, 0xbe, 0xe2, 0x2e, 0x40, 0x9f, 0x96, 0xe9, 0x3d, 0x7e, 0x11, 0x73, 0x93, 0x17, 0x2a, 0xae, 0x2d, 0x8a, 0x57, 0x1e, 0x03, 0xac, 0x9c, 0x9e, 0xb7, 0x6f, 0xac, 0x45, 0xaf, 0x8e, 0x51, 0x30, 0xc8, 0x1c, 0x46, 0xa3, 0x5c, 0xe4, 0x11, 0xe5, 0xfb, 0xc1, 0x19, 0x1a, 0x0a, 0x52, 0xef, 0xf6, 0x9f, 0x24, 0x45, 0xdf, 0x4f, 0x9b, 0x17, 0xad, 0x2b, 0x41, 0x7b, 0xe6, 0x6c, 0x37, 0x10 };
+       
         private static readonly byte[] keyBytes128 = Hex.Decode("2b7e151628aed2a6abf7158809cf4f3c");
         private static readonly byte[] keyBytes192 = Hex.Decode("8e73b0f7da0e6452c810f32b809079e5" + "62f8ead2522c6b7b");
         private static readonly byte[] keyBytes256 = Hex.Decode("603deb1015ca71be2b73aef0857d7781"+ "1f352c073b6108d72d9810a30914dff4");
@@ -47,10 +52,33 @@ namespace ConsoleApp1
 
         public static void PerformTest()
         {
-           
- 
+            //ISO20038 vp = new ISO20038();
+            //vp.runTest();
+            //**
+
+            Console.WriteLine("  +-----+     +-----+     +-----+     +-----+     +-----+     +---+----+     ");
+            Console.WriteLine("  | M_1 |     | M_2 |     | M_n |     | M_1 |     | M_2 |     |M_n|10^i|     ");
+            Console.WriteLine("  +-----+     +-----+     +-----+     +-----+     +-----+     +---+----+     ");
+            Console.WriteLine("     |           |           |   +--+    |           |            |   +--+   ");
+            Console.WriteLine("     |     +--->(+)    +--->(+)<-|K1|    |     +--->(+)     +--->(+)<-|K2|   ");
+            Console.WriteLine("     |     |     |     |     |   +--+    |     |     |      |     |   +--+   ");
+            Console.WriteLine("  +-----+  | +-----+   |  +-----+     +-----+  |   +-----+  |  +-----+       ");
+            Console.WriteLine("  |AES_K|  | |AES_K|   |  |AES_K|     |AES_K|  |   |AES_K | |  |AES_K|       ");
+            Console.WriteLine("  +-----+  | +-----+   |  +-----+     +-----+  |   +-----+  |  +-----+       ");
+            Console.WriteLine("     |     |     |     |     |           |     |      |     |     |          ");
+            Console.WriteLine("     +-----+     +-----+     |           +-----+      +-----+     |          ");
+            Console.WriteLine("                             |                                    |          ");
+            Console.WriteLine("                          +-----+                              +-----+       ");
+            Console.WriteLine("                          |  T  |                              |  T  |       ");
+            Console.WriteLine("                          +-----+                              +-----+       ");
+
+
+
+
+
+
             IBlockCipher cipher = new AesEngine();
-            
+
             IMac mac = new CMac(cipher, 128);
             Console.WriteLine("CMAC Init.. Cipher: " + cipher.AlgorithmName);
             Console.WriteLine("CMAC Init.. MAC BlockSize: " + 128);
@@ -64,30 +92,30 @@ namespace ConsoleApp1
 
             // 0 bytes message - 128 bytes key
             mac.Init(key);
-            
+
             mac.BlockUpdate(input0, 0, input0.Length);
 
             byte[] outBytes = new byte[16];
 
             mac.DoFinal(outBytes, 0);
 
-            if (!AreEqual(outBytes,output_k128_m0))
+            if (!AreEqual(outBytes, output_k128_m0))
             {
                 Console.WriteLine("Failed - expected "
                     + Hex.ToHexString(output_k128_m0) + " got "
                     + Hex.ToHexString(outBytes));
             }
-            Console.WriteLine("CMAC:"+ Hex.ToHexString(outBytes));
+            Console.WriteLine("CMAC:" + Hex.ToHexString(outBytes));
             Console.WriteLine("----------------------------------------------------------------");
 
             // 16 bytes message - 128 bytes key
-            Console.WriteLine("Example 2: Message len = "+ input16.Length + " bytes, key = " + keyBytes128.Length + " bytes");
+            Console.WriteLine("Example 2: Message len = " + input16.Length + " bytes, key = " + keyBytes128.Length + " bytes");
             Console.WriteLine("M:   " + Hex.ToHexString(input16));
             Console.WriteLine("KEY: " + Hex.ToHexString(keyBytes128));
             mac.Init(key);
-            
+
             mac.BlockUpdate(input16, 0, input16.Length);
-            
+
             outBytes = new byte[16];
 
             mac.DoFinal(outBytes, 0);
@@ -101,13 +129,13 @@ namespace ConsoleApp1
             Console.WriteLine("CMAC:" + Hex.ToHexString(outBytes));
             Console.WriteLine("----------------------------------------------------------------");
             // 40 bytes message - 128 bytes key
-            Console.WriteLine("Example 3: Message len = "+ input40.Length + " bytes, key = " + keyBytes128.Length + " bytes");
+            Console.WriteLine("Example 3: Message len = " + input40.Length + " bytes, key = " + keyBytes128.Length + " bytes");
             Console.WriteLine("M:   " + Hex.ToHexString(input40));
             Console.WriteLine("KEY: " + Hex.ToHexString(keyBytes128));
             mac.Init(key);
-            
+
             mac.BlockUpdate(input40, 0, input40.Length);
-            
+
 
             outBytes = new byte[16];
 
@@ -121,13 +149,13 @@ namespace ConsoleApp1
             Console.WriteLine("CMAC:" + Hex.ToHexString(outBytes));
             Console.WriteLine("----------------------------------------------------------------");
             // 64 bytes message - 128 bytes key
-            Console.WriteLine("Example 4: Message len = "+ input64.Length + " bytes, key = "+ keyBytes128.Length + " bytes");
+            Console.WriteLine("Example 4: Message len = " + input64.Length + " bytes, key = " + keyBytes128.Length + " bytes");
             Console.WriteLine("M:   " + Hex.ToHexString(input64));
             Console.WriteLine("KEY: " + Hex.ToHexString(keyBytes128));
             mac.Init(key);
-            
+
             mac.BlockUpdate(input64, 0, input64.Length);
-            
+
             outBytes = new byte[16];
 
             mac.DoFinal(outBytes, 0);
@@ -142,9 +170,9 @@ namespace ConsoleApp1
             Console.WriteLine("----------------------------------------------------------------");
             //192 bytes key
             key = new KeyParameter(keyBytes192);
-            Console.WriteLine("Example 5: Message len = 0 bytes, key = 192 bytes");
+            Console.WriteLine("Example 5: Message len = 0 bytes, key = "+ keyBytes192.Length + " bytes");
             Console.WriteLine("M:   " + Hex.ToHexString(input0));
-            Console.WriteLine("KEY: " + Hex.ToHexString(keyBytes192));         
+            Console.WriteLine("KEY: " + Hex.ToHexString(keyBytes192));
             // 0 bytes message - 192 bytes ke
 
             mac.Init(key);
@@ -164,19 +192,19 @@ namespace ConsoleApp1
             Console.WriteLine("Generated CMAC:" + Hex.ToHexString(outBytes));
             Console.WriteLine("----------------------------------------------------------------");
             // 16 bytes message - 192 bytes key
-            Console.WriteLine("Example 6: Message len = 16 bytes, key = 192 bytes");
+            Console.WriteLine("Example 6: Message len = "+ input16.Length + " bytes, key = " + keyBytes192.Length + " bytes");
             Console.WriteLine("M:   " + Hex.ToHexString(input16));
             Console.WriteLine("KEY: " + Hex.ToHexString(keyBytes192));
             mac.Init(key);
-            
-            
+
+
             mac.BlockUpdate(input16, 0, input16.Length);
-            
+
             outBytes = new byte[16];
 
             mac.DoFinal(outBytes, 0);
 
-            if (!AreEqual(outBytes , output_k192_m16))
+            if (!AreEqual(outBytes, output_k192_m16))
             {
                 Console.WriteLine("Failed - expected "
                     + Hex.ToHexString(output_k192_m16) + " got "
@@ -185,13 +213,13 @@ namespace ConsoleApp1
             Console.WriteLine("Generated CMAC:" + Hex.ToHexString(outBytes));
             Console.WriteLine("----------------------------------------------------------------");
             // 40 bytes message - 192 bytes key
-            Console.WriteLine("Example 7: Message len = 40 bytes, key = 192 bytes");
+            Console.WriteLine("Example 7: Message len = "+ input40.Length + " bytes, key = "+ keyBytes192.Length + " bytes");
             Console.WriteLine("M:   " + Hex.ToHexString(input40));
             Console.WriteLine("KEY: " + Hex.ToHexString(keyBytes192));
 
-            mac.Init(key);         
+            mac.Init(key);
             mac.BlockUpdate(input40, 0, input40.Length);
-            
+
             outBytes = new byte[16];
 
             mac.DoFinal(outBytes, 0);
@@ -205,13 +233,13 @@ namespace ConsoleApp1
             Console.WriteLine("Generated CMAC:" + Hex.ToHexString(outBytes));
             Console.WriteLine("----------------------------------------------------------------");
             // 64 bytes message - 192 bytes key
-            Console.WriteLine("Example 8: Message len = 64 bytes, key = 192 bytes");
+            Console.WriteLine("Example 8: Message len = "+ input64.Length + " bytes, key = "+ keyBytes192.Length + " bytes");
             Console.WriteLine("M:   " + Hex.ToHexString(input64));
             Console.WriteLine("KEY: " + Hex.ToHexString(keyBytes192));
             mac.Init(key);
-            
+
             mac.BlockUpdate(input64, 0, input64.Length);
-            
+
             outBytes = new byte[16];
 
             mac.DoFinal(outBytes, 0);
@@ -227,12 +255,12 @@ namespace ConsoleApp1
             //256 bytes key
 
             key = new KeyParameter(keyBytes256);
-            Console.WriteLine("Example 9: Message len = 0 bytes, key = 256 bytes");
+            Console.WriteLine("Example 9: Message len = 0 bytes, key = "+ keyBytes256.Length + " bytes");
             Console.WriteLine("M:   " + Hex.ToHexString(input0));
             Console.WriteLine("KEY: " + Hex.ToHexString(keyBytes256));
             // 0 bytes message - 256 bytes key
             mac.Init(key);
-            
+
             mac.BlockUpdate(input0, 0, input0.Length);
 
             outBytes = new byte[16];
@@ -248,13 +276,13 @@ namespace ConsoleApp1
             Console.WriteLine("Generated CMAC:" + Hex.ToHexString(outBytes));
             Console.WriteLine("----------------------------------------------------------------");
             // 16 bytes message - 256 bytes key
-            Console.WriteLine("Example 10: Message len = 16 bytes, key = 256 bytes");
+            Console.WriteLine("Example 10: Message len = "+ input16.Length + " bytes, key = "+ keyBytes256.Length + " bytes");
             Console.WriteLine("M:   " + Hex.ToHexString(input16));
             Console.WriteLine("KEY: " + Hex.ToHexString(keyBytes256));
             mac.Init(key);
-           
+
             mac.BlockUpdate(input16, 0, input16.Length);
-            
+
             outBytes = new byte[16];
 
             mac.DoFinal(outBytes, 0);
@@ -268,18 +296,18 @@ namespace ConsoleApp1
             Console.WriteLine("Generated CMAC:" + Hex.ToHexString(outBytes));
             Console.WriteLine("----------------------------------------------------------------");
             // 40 bytes message - 256 bytes key
-            Console.WriteLine("Example 11: Message len = 40 bytes, key = 256 bytes");
+            Console.WriteLine("Example 11: Message len = "+ input40.Length + " bytes, key = "+ keyBytes256.Length + " bytes");
             Console.WriteLine("M:   " + Hex.ToHexString(input40));
             Console.WriteLine("KEY: " + Hex.ToHexString(keyBytes256));
             mac.Init(key);
-           
+
             mac.BlockUpdate(input40, 0, input40.Length);
-            
+
             outBytes = new byte[16];
 
             mac.DoFinal(outBytes, 0);
 
-            if (!AreEqual(outBytes,output_k256_m40))
+            if (!AreEqual(outBytes, output_k256_m40))
             {
                 Console.WriteLine("Failed - expected "
                     + Hex.ToHexString(output_k256_m40) + " got "
@@ -288,13 +316,13 @@ namespace ConsoleApp1
             Console.WriteLine("Generated CMAC:" + Hex.ToHexString(outBytes));
             Console.WriteLine("----------------------------------------------------------------");
             // 64 bytes message - 256 bytes key
-            Console.WriteLine("Example 12: Message len = 64 bytes, key = 256 bytes");
+            Console.WriteLine("Example 12: Message len = "+ input64.Length+" bytes, key = "+ keyBytes256.Length + " bytes");
             Console.WriteLine("M:   " + Hex.ToHexString(input64));
             Console.WriteLine("KEY: " + Hex.ToHexString(keyBytes256));
             mac.Init(key);
-            
+
             mac.BlockUpdate(input64, 0, input64.Length);
-            
+
             outBytes = new byte[16];
 
             mac.DoFinal(outBytes, 0);
@@ -307,7 +335,7 @@ namespace ConsoleApp1
             }
             Console.WriteLine("Generated CMAC:" + Hex.ToHexString(outBytes));
             Console.WriteLine("----------------------------------------------------------------");
-            //TestExceptions();
+            TestExceptions();
         }
 
         private static void TestExceptions()

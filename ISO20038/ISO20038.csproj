@@ -45,6 +45,8 @@
     <Compile Include="AES.cs" />
     <Compile Include="CMAC.cs" />
     <Compile Include="ISO20038.cs" />
+    <Compile Include="KeyBlockHeader.cs" />
+    <Compile Include="KeyDerevationBlock.cs" />
     <Compile Include="OMAC.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
